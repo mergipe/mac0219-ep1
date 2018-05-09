@@ -1,14 +1,16 @@
-#include "matrixio.h"
+#include "mtrio.h"
+#include "mtrmem.h"
+#include "mtrmul.h"
 
-#include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 int main(int argc, char *argv[])
 {
+    double **mtr_A, **mtr_B, **mtr_C;
     uint64_t m, p, n;
-    double **A, **B, **C;
-    FILE *AFile, *BFile, *CFile;
+    FILE *aFile, *bFile, *cFile;
 
     if (argc != 4)
     {
@@ -16,53 +18,40 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    AFile = fopen(argv[1], "r");
-    if (AFile == NULL)
+    aFile = fopen(argv[1], "r");
+    if (aFile == NULL)
     {
         printf("Error opening file %s\n", argv[1]);
         return EXIT_FAILURE;
     }
 
-    BFile = fopen(argv[2], "r");
-    if (BFile == NULL)
+    bFile = fopen(argv[2], "r");
+    if (bFile == NULL)
     {
         printf("Error opening file %s\n", argv[2]);
         return EXIT_FAILURE;
     }
 
-    CFile = fopen(argv[3], "w");
+    cFile = fopen(argv[3], "w");
 
-    if (CFile == NULL)
+    if (cFile == NULL)
     {
         printf("Error opening file %s\n", argv[3]);
         return EXIT_FAILURE;
     }
 
-    A = read_matrix(&m, &p, AFile);
-    fclose(AFile);
-    B = read_matrix(&p, &n, BFile);
-    fclose(BFile);
+    mtr_A = readmtr(&m, &p, aFile);
+    fclose(aFile);
+    mtr_B = readmtr(&p, &n, bFile);
+    fclose(bFile);
 
-    C = malloc(m * sizeof (double *));
-    for (uint64_t i = 0; i < m; i++)
-        C[i] = malloc(n * sizeof (double));
+    mtr_C = mtrmul_naive(mtr_A, mtr_B, m, p, n);
+    printmtr(mtr_C, m, n, cFile);
+    fclose(cFile);
 
-    /* Faz os cálculos... */
-
-    print_matrix(C, m, n, CFile);
-    fclose(CFile);
-
-    for (uint64_t i = 0; i < m; i++)
-    {
-        free(A[i]);
-        free(C[i]);
-    }
-    free(A);
-    free(C);
-
-    for (uint64_t i = 0; i < p; i++)
-        free(B[i]);
-    free(B);
+    mtrclear(mtr_A, m, p);
+    mtrclear(mtr_B, p, n);
+    mtrclear(mtr_C, m, n);
 
     return EXIT_SUCCESS;
 }
