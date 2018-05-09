@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
     double **mtr_A, **mtr_B, **mtr_C;
     uint64_t m, p, n;
