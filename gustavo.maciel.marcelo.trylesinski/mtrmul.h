@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+#define OPENMP_IMPL 'o'
+#define PTHREAD_IMPL 'p'
+
 /* Devolve a matriz double (m por n) resultante da multiplicacao de mtr_A
  * (m por p) por mtr_B (p por n). Utiliza o método iterativo baseado na
  * definicao de multiplicacao entre matrizes. */
