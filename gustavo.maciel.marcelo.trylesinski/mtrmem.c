@@ -3,20 +3,31 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-double **mtrinit(uint64_t m, uint64_t n)
-{
-    double **mtr;
+#define M(i,j) mtr[j * m + i]
 
-    mtr = malloc(m * sizeof (double *));
-    for (uint64_t i = 0; i < m; i++)
-        mtr[i] = malloc(n * sizeof (double));
+double *mtralloc(uint64_t m, uint64_t n)
+{
+    double *mtr;
+
+    mtr = (double *) malloc(m * n * sizeof (double));
 
     return mtr;
 }
 
-void mtrclear(double **mtr, uint64_t m, uint64_t n)
+double *mtrcalloc(uint64_t m, uint64_t n)
 {
+    double *mtr;
+
+    mtr = mtralloc(m, n);
+
     for (uint64_t i = 0; i < m; i++)
-        free(mtr[i]);
+        for (uint64_t j = 0; j < n; j++)
+            M(i,j) = 0;
+
+    return mtr;
+}
+
+void mtrfree(double *mtr)
+{
     free(mtr);
 }

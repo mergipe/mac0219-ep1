@@ -9,7 +9,7 @@
 int main(int argc, char **argv)
 {
     char impl;
-    double **mtr_A, **mtr_B, **mtr_C;
+    double *a, *b, *c;
     uint64_t m, p, n;
     FILE *aFile, *bFile, *cFile;
 
@@ -46,25 +46,27 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    mtr_A = readmtr(&m, &p, aFile);
+    a = readmtr(&m, &p, aFile);
     fclose(aFile);
-    mtr_B = readmtr(&p, &n, bFile);
+    b = readmtr(&p, &n, bFile);
     fclose(bFile);
+    c = mtrcalloc(m, n);
+
+printmtr(a, m, p, stdout);
+printmtr(b, p, n, stdout);
 
     if (impl == OPENMP_IMPL)
-    {
-    }
+        mtrmul_naive(a, b, c, m, p, n);
     else
-    {
-    }
+        mtrmul_naive(a, b, c, m, p, n);
 
-    mtr_C = mtrmul_naive(mtr_A, mtr_B, m, p, n);
-    printmtr(mtr_C, m, n, cFile);
+printmtr(c, m, n, stdout);
+    printmtr(c, m, n, cFile);
     fclose(cFile);
 
-    mtrclear(mtr_A, m, p);
-    mtrclear(mtr_B, p, n);
-    mtrclear(mtr_C, m, n);
+    mtrfree(a);
+    mtrfree(b);
+    mtrfree(c);
 
     return EXIT_SUCCESS;
 }

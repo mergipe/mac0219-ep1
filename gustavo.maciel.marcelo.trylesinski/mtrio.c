@@ -5,15 +5,18 @@
 #include <stdint.h>
 #include <stdio.h>
 
-double **readmtr(uint64_t *m, uint64_t *n, FILE *mFile)
+#define M_(i,j) mtr[j * (*m) + i]
+#define M(i,j) mtr[j * m + i]
+
+double *readmtr(uint64_t *m, uint64_t *n, FILE *mFile)
 {
     uint64_t i_, j_;
-    double **mtr, value;
+    double *mtr, value;
 
     fscanf(mFile, "%" SCNu64, m);
     fscanf(mFile, "%" SCNu64, n);
 
-    mtr = mtrinit(*m, *n);
+    mtr = mtralloc(*m, *n);
 
     fscanf(mFile, "%" SCNu64, &i_);
     fscanf(mFile, "%" SCNu64, &j_);
@@ -25,7 +28,7 @@ double **readmtr(uint64_t *m, uint64_t *n, FILE *mFile)
         {
             if (i + 1 == i_ && j + 1 == j_)
             {
-                mtr[i][j] = value;
+                M_(i,j) = value;
 
                 if (!feof(mFile))
                 {
@@ -36,7 +39,7 @@ double **readmtr(uint64_t *m, uint64_t *n, FILE *mFile)
             }
             else
             {
-                mtr[i][j] = 0;
+                M_(i,j) = 0;
             }
         }
     }
@@ -44,7 +47,7 @@ double **readmtr(uint64_t *m, uint64_t *n, FILE *mFile)
     return mtr;
 }
 
-void printmtr(double **mtr, uint64_t m, uint64_t n, FILE *mFile)
+void printmtr(double *mtr, uint64_t m, uint64_t n, FILE *mFile)
 {
     fprintf(mFile, "%" PRIu64 " %" PRIu64, m, n);
 
@@ -52,11 +55,10 @@ void printmtr(double **mtr, uint64_t m, uint64_t n, FILE *mFile)
     {
         for (uint64_t j = 0; j < n; j++)
         {
-            if (mtr[i][j] != 0)
+            if (M(i,j) != 0)
             {
-                fprintf(mFile,
-                        "\n%" PRIu64 " %" PRIu64 " %f",
-                        i + 1, j + 1, mtr[i][j]);
+                fprintf(mFile, "\n%" PRIu64 " %" PRIu64 " %f",
+                        i + 1, j + 1, M(i,j));
             }
         }
     }

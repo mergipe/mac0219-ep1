@@ -1,27 +1,38 @@
-#include "mtrmem.h"
 #include "mtrmul.h"
 
 #include <stdint.h>
 
-double **mtrmul_naive(double **mtr_A, double **mtr_B, uint64_t m, uint64_t p,
-                      uint64_t n)
+#define A(i,j) a[j * m + i]
+#define B(i,j) b[j * p + i]
+#define C(i,j) c[j * m + i]
+
+void mtrmul_naive(double *a, double *b, double *c,
+                  uint64_t m, uint64_t p, uint64_t n)
 {
-    double **mtr_C;
-
-    mtr_C = mtrinit(m, n);
-
     for (uint64_t i = 0; i < m; i++)
     {
         for (uint64_t j = 0; j < n; j++)
         {
-            double sum = 0;
-
             for (uint64_t k = 0; k < p; k++)
-                sum += mtr_A[i][k] * mtr_B[k][j];
+            {
+                C(i,j) = C(i,j) + A(i,k) * B(k,j);
+            }
+        }
+    }
+}
 
-            mtr_C[i][j] = sum;
+void mtrmul_opt(double *a, double *b, double *c,
+                uint64_t m, uint64_t p, uint64_t n)
+{
+    for (uint64_t i = 0; i < m; i++)
+    {
+        for (uint64_t j = 0; j < n; j++)
+        {
+            for (uint64_t k = 0; k < p; k++)
+            {
+                C(i,j) = C(i,j) + A(i,k) * B(k,j);
+            }
         }
     }
 
-    return mtr_C;
 }

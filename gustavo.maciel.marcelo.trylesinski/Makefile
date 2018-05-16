@@ -17,4 +17,4 @@ mtrmem.o: mtrmem.c mtrmem.h
 	$(CC) $(CFLAGS) -c $<
 
 clean:
-	rm -f *.o main 
+	rm -f *.o *~ main 

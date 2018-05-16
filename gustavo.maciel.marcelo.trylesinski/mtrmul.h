@@ -6,10 +6,14 @@
 #define OPENMP_IMPL 'o'
 #define PTHREAD_IMPL 'p'
 
-/* Devolve a matriz double (m por n) resultante da multiplicacao de mtr_A
- * (m por p) por mtr_B (p por n). Utiliza o método iterativo baseado na
- * definicao de multiplicacao entre matrizes. */
-double **mtrmul_naive(double **mtr_A, double **mtr_B, uint64_t m, uint64_t p,
-                      uint64_t n);
+/* Computa c = a * b + c, sendo a, b e c matrizes double (m por p), (p por n)
+ * e (m por n), respectivamente. */
+void mtrmul_naive(double *a, double *b, double *c,
+                  uint64_t m, uint64_t p, uint64_t n);
+
+/* Computa c = a * b + c, sendo a, b e c matrizes double (m por p), (p por n)
+ * e (m por n), respectivamente. */
+void mtrmul_opt(double *a, double *b, double *c,
+                uint64_t m, uint64_t p, uint64_t n);
 
 #endif

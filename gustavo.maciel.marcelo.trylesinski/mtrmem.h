@@ -3,10 +3,13 @@
 
 #include <stdint.h>
 
-/* Inicializa e devolve uma matriz double m por n. */
-double **mtrinit(uint64_t m, uint64_t n);
+/* Aloca e devolve uma matriz double m por n, nao inicializada. */
+double *mtralloc(uint64_t m, uint64_t n);
 
-/* Limpa o espaco ocupado pela matriz double mtr m por n. */
-void mtrclear(double **mtr, uint64_t m, uint64_t n);
+/* Aloca e devolve uma matriz nula double m por n. */
+double *mtrcalloc(uint64_t m, uint64_t n);
+
+/* Limpa o espaco ocupado pela matriz double mtr. */
+void mtrfree(double *mtr);
 
 #endif
