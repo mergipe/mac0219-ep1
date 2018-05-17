@@ -5,12 +5,13 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 int main(int argc, char **argv)
 {
     char impl;
     double *a, *b, *c;
-    uint64_t m, p, n;
+    uint64_t m, p, n, lda, ldb, ldc;
     FILE *aFile, *bFile, *cFile;
 
     if (argc != 5 || (argv[1][0] != OPENMP_IMPL && argv[1][0] != PTHREAD_IMPL))
@@ -47,22 +48,29 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    a = readmtr(&m, &p, aFile);
+    a = readmtr(&m, &p, &lda, aFile);
     fclose(aFile);
-    b = readmtr(&p, &n, bFile);
+    b = readmtr(&p, &n, &ldb, bFile);
     fclose(bFile);
-    c = mtrcalloc(m, n);
 
-printmtr(a, m, p, stdout);
-printmtr(b, p, n, stdout);
+    ldc = m;
+    c = mtrcalloc(ldc, n);
+
+printf("\nMatriz A (%" PRIu64 " por %" PRIu64 "), lda = %" PRIu64 "\n", m, p, lda);
+printmtr(m, p, a, lda, stdout);
+printf("\nMatriz B (%" PRIu64 " por %" PRIu64 "), ldb = %" PRIu64 "\n", p, n, ldb);
+printmtr(p, n, b, ldb, stdout);
 
     if (impl == OPENMP_IMPL)
-        mtrmul_naive(a, b, c, m, p, n);
+        mtrmul_opt(m, p, n, a, lda, b, ldb, c, ldc);
     else
-        mtrmul_naive(a, b, c, m, p, n);
+        mtrmul_opt(m, p, n, a, lda, b, ldb, c, ldc);
 
-printmtr(c, m, n, stdout);
-    printmtr(c, m, n, cFile);
+printf("\nMatriz C (%" PRIu64 " por %" PRIu64 "), ldc = %" PRIu64 "\n", m, n, ldc);
+printmtr(m, n, c, ldc, stdout);
+printf("\n");
+
+    printmtr(m, n, c, ldc, cFile);
     fclose(cFile);
 
     mtrfree(a);

@@ -5,18 +5,19 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define M_(i,j) mtr[j * (*m) + i]
-#define M(i,j) mtr[j * m + i]
+#define M_(i,j) mtr[j * (*ld) + i]
+#define M(i,j) mtr[j * ld + i]
 
-double *readmtr(uint64_t *m, uint64_t *n, FILE *mFile)
+double *readmtr(uint64_t *m, uint64_t *n, uint64_t *ld, FILE *mFile)
 {
     uint64_t i_, j_;
     double *mtr, value;
 
     fscanf(mFile, "%" SCNu64, m);
     fscanf(mFile, "%" SCNu64, n);
+    *ld = *m;
 
-    mtr = mtralloc(*m, *n);
+    mtr = mtralloc(*ld, *n);
 
     fscanf(mFile, "%" SCNu64, &i_);
     fscanf(mFile, "%" SCNu64, &j_);
@@ -47,7 +48,7 @@ double *readmtr(uint64_t *m, uint64_t *n, FILE *mFile)
     return mtr;
 }
 
-void printmtr(double *mtr, uint64_t m, uint64_t n, FILE *mFile)
+void printmtr(uint64_t m, uint64_t n, double *mtr, uint64_t ld, FILE *mFile)
 {
     fprintf(mFile, "%" PRIu64 " %" PRIu64, m, n);
 

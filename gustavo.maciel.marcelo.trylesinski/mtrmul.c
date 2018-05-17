@@ -2,12 +2,14 @@
 
 #include <stdint.h>
 
-#define A(i,j) a[j * m + i]
-#define B(i,j) b[j * p + i]
-#define C(i,j) c[j * m + i]
+#define A(i,j) a[j * lda + i]
+#define B(i,j) b[j * ldb + i]
+#define C(i,j) c[j * ldc + i]
 
-void mtrmul_naive(double *a, double *b, double *c,
-                  uint64_t m, uint64_t p, uint64_t n)
+void mtrmul_naive(uint64_t m, uint64_t p, uint64_t n,
+                  double *a, uint64_t lda,
+                  double *b, uint64_t ldb,
+                  double *c, uint64_t ldc)
 {
     for (uint64_t i = 0; i < m; i++)
     {
@@ -21,8 +23,10 @@ void mtrmul_naive(double *a, double *b, double *c,
     }
 }
 
-void mtrmul_opt(double *a, double *b, double *c,
-                uint64_t m, uint64_t p, uint64_t n)
+void mtrmul_opt(uint64_t m, uint64_t p, uint64_t n,
+                double *a, uint64_t lda,
+                double *b, uint64_t ldb,
+                double *c, uint64_t ldc)
 {
     for (uint64_t i = 0; i < m; i++)
     {

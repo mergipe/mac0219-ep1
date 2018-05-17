@@ -4,10 +4,12 @@
 #include <stdint.h>
 #include <stdio.h>
 
-/* Devolve uma matriz double m por n lida de mFile. */
-double *readmtr(uint64_t *m, uint64_t *n, FILE *mFile);
+/* Devolve uma matriz double m por n, com leading dimension ld, lida de
+ * mFile. */
+double *readmtr(uint64_t *m, uint64_t *n, uint64_t *ld, FILE *mFile);
 
-/* Escreve a matriz double mtr m por n no arquivo mFile. */
-void printmtr(double *mtr, uint64_t m, uint64_t n, FILE *mFile);
+/* Escreve a matriz double mtr m por n, com leading dimension ld, no arquivo
+ * mFile. */
+void printmtr(uint64_t m, uint64_t n, double *mtr, uint64_t ld, FILE *mFile);
 
 #endif

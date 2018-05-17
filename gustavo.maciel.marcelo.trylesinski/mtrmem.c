@@ -3,25 +3,25 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define M(i,j) mtr[j * m + i]
+#define M(i,j) mtr[j * ld + i]
 
-double *mtralloc(uint64_t m, uint64_t n)
+double *mtralloc(uint64_t ld, uint64_t od)
 {
     double *mtr;
 
-    mtr = (double *) malloc(m * n * sizeof (double));
+    mtr = (double *) malloc(ld * od * sizeof (double));
 
     return mtr;
 }
 
-double *mtrcalloc(uint64_t m, uint64_t n)
+double *mtrcalloc(uint64_t ld, uint64_t od)
 {
     double *mtr;
 
-    mtr = mtralloc(m, n);
+    mtr = mtralloc(ld, od);
 
-    for (uint64_t i = 0; i < m; i++)
-        for (uint64_t j = 0; j < n; j++)
+    for (uint64_t i = 0; i < ld; i++)
+        for (uint64_t j = 0; j < od; j++)
             M(i,j) = 0;
 
     return mtr;
