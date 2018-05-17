@@ -16,8 +16,11 @@ mtrmul.o: mtrmul.c mtrmul.h
 mtrmem.o: mtrmem.c mtrmem.h
 	$(CC) $(CFLAGS) -c $<
 
-teste: test.o mtrio.o mtrmul.o mtrmem.o
+teste: test.o mtrio.o mtrmul.o mtrmem.o dclock.o
 	$(CC) $(CFLAGS) -o $@ $^
+
+dclock.o: test/dclock.c
+	$(CC) $(CFLAGS) -c $<
 
 test.o: test/test.c
 	$(CC) $(CFLAGS) -c $<

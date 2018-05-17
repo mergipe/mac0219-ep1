@@ -10,10 +10,13 @@
 #define PLAST  1000
 #define PINC   50
 
-#define NREPEATS 5
+#define NREPEATS 3
 
 #define A(i,j) a[j * lda + i]
 #define B(i,j) b[j * ldb + i]
+#define abs(x) (x < 0.0 ? -x : x)
+
+double dclock();
 
 void random_matrix(uint64_t m, uint64_t n, double *a, uint64_t lda)
 {
@@ -32,11 +35,28 @@ void copy_matrix(uint64_t m, uint64_t n, double *a, uint64_t lda, double *b,
             B(i,j) = A(i,j);
 }
 
+double compare_matrices(uint64_t m, uint64_t n, double *a, uint64_t lda,
+        double *b, uint64_t ldb)
+{
+    double max_diff = 0.0, diff;
+
+    for (uint64_t j = 0; j < n; j++)
+    {
+        for (uint64_t i = 0; i < m; i++)
+        {
+            diff = abs(A(i,j) - B(i,j));
+            max_diff = (diff > max_diff ? diff : max_diff);
+        }
+    }
+
+    return max_diff;
+}
+
 int main()
 {
     double *a, *b, *c, *cold, *cref;
-    uint64_t m, p, n, k, lda, ldb, ldc;
-    double gflops;
+    uint64_t m, p, n, lda, ldb, ldc;
+    double gflops, dtime, dtime_best, diff;
 
 /*FILE *aFile, *bFile;
 aFile = fopen("data/A", "w");
@@ -52,7 +72,7 @@ fclose(bFile);*/
 
     printf("MY_MMult = [\n");
 
-    for (k = PFIRST; k <= PLAST; k += PINC)
+    for (int k = PFIRST; k <= PLAST; k += PINC)
     {
         m = p = n = k;
 
@@ -75,7 +95,36 @@ fclose(bFile);*/
         copy_matrix(m, n, cold, ldc, cref, ldc);
 
         mtrmul_naive(m, p, n, a, lda, b, ldb, cref, ldc);
+
+        for (int rep = 0; rep < NREPEATS; rep++)
+        {
+            copy_matrix(m, n, cold, ldc, c, ldc);
+
+            dtime = dclock();
+
+            mtrmul_opt(m, p, n, a, lda, b, ldb, c, ldc);
+
+            dtime = dclock() - dtime;
+
+            if (rep == 0)
+                dtime_best = dtime;
+            else
+                dtime_best = (dtime < dtime_best ? dtime : dtime_best);
+        }
+
+        diff = compare_matrices(m, n, c, ldc, cref, ldc);
+
+        printf("%d %le %le \n", k, gflops / dtime_best, diff);
+        fflush(stdout);
+
+        mtrfree(a);
+        mtrfree(b);
+        mtrfree(c);
+        mtrfree(cold);
+        mtrfree(cref);
     }
+
+    printf("];\n");
 
     return EXIT_SUCCESS;
 }

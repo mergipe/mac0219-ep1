@@ -20,8 +20,8 @@ double *mtrcalloc(uint64_t ld, uint64_t od)
 
     mtr = mtralloc(ld, od);
 
-    for (uint64_t i = 0; i < ld; i++)
-        for (uint64_t j = 0; j < od; j++)
+    for (uint64_t j = 0; j < od; j++)
+        for (uint64_t i = 0; i < ld; i++)
             M(i,j) = 0;
 
     return mtr;
