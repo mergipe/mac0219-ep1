@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 #define PFIRST 50
 #define PLAST  1000
@@ -79,6 +80,13 @@ fclose(bFile);*/
         lda = m;
         ldb = p;
         ldc = m;
+
+        while (lda % 4 != 0)
+        {
+            lda++;
+            ldb++;
+            ldc++;
+        }
 
         gflops = 2.0 * m * p * n * 1.0e-09;
 

@@ -3,8 +3,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define M(i,j) mtr[j * ld + i]
-
 double *mtralloc(uint64_t ld, uint64_t od)
 {
     double *mtr;

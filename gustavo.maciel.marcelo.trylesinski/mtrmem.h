@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define M(i,j) mtr[j * ld + i]
+
 /* Aloca e devolve uma matriz double ld por od, nao inicializada, com leading
  * dimension ld. */
 double *mtralloc(uint64_t ld, uint64_t od);
