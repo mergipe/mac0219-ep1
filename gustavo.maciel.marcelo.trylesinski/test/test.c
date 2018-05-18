@@ -81,13 +81,6 @@ fclose(bFile);*/
         ldb = p;
         ldc = m;
 
-        while (lda % 4 != 0)
-        {
-            lda++;
-            ldb++;
-            ldc++;
-        }
-
         gflops = 2.0 * m * p * n * 1.0e-09;
 
         a = mtralloc(lda, p);

@@ -14,8 +14,6 @@ double *readmtr(uint64_t *m, uint64_t *n, uint64_t *ld, FILE *mFile)
     fscanf(mFile, "%" SCNu64, n);
 
     *ld = *m;
-    while (*ld % 4 != 0)
-        (*ld)++;
 
     mtr = mtralloc(*ld, *n);
 
