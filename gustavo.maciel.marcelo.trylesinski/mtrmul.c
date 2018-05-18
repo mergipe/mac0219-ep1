@@ -14,13 +14,33 @@ static void dotprod(double *a, uint64_t lda, double *b, double *c, uint64_t p)
 static void dotprod_1x4(double *a, uint64_t lda, double *b, uint64_t ldb,
                         double *c, uint64_t ldc, uint64_t p)
 {
+    register double c_00_reg, c_01_reg, c_02_reg, c_03_reg, a_0k_reg;
+    double *b_p0_pntr, *b_p1_pntr, *b_p2_pntr, *b_p3_pntr;
+
+    c_00_reg = C(0,0);
+    c_01_reg = C(0,1);
+    c_02_reg = C(0,2);
+    c_03_reg = C(0,3);
+
+    b_p0_pntr = &B(0,0);
+    b_p1_pntr = &B(0,1);
+    b_p2_pntr = &B(0,2);
+    b_p3_pntr = &B(0,3);
+
     for (uint64_t k = 0; k < p; k++)
     {
-        C(0,0) += A(0,p) * B(p,0);
-        C(0,1) += A(0,p) * B(p,1);
-        C(0,2) += A(0,p) * B(p,2);
-        C(0,3) += A(0,p) * B(p,3);
+        a_0k_reg = A(0,k);
+
+        c_00_reg += a_0k_reg * *b_p0_pntr++;
+        c_01_reg += a_0k_reg * *b_p1_pntr++;
+        c_02_reg += a_0k_reg * *b_p2_pntr++;
+        c_03_reg += a_0k_reg * *b_p3_pntr++;
     }
+
+    C(0,0) = c_00_reg;
+    C(0,1) = c_01_reg;
+    C(0,2) = c_02_reg;
+    C(0,3) = c_03_reg;
 }
 
 void mtrmul_opt(uint64_t m, uint64_t p, uint64_t n,

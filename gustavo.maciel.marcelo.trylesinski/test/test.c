@@ -106,6 +106,7 @@ fclose(bFile);*/
             mtrmul_opt(m, p, n, a, lda, b, ldb, c, ldc);
 
             dtime = dclock() - dtime;
+            printf("asuiehasuiheauisheuhasueiasuihe %le\n", dtime);
 
             if (rep == 0)
                 dtime_best = dtime;
