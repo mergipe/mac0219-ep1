@@ -15,7 +15,7 @@ double *readmtr(uint64_t *m, uint64_t *n, uint64_t *ld, FILE *mFile)
 
     *ld = *m;
 
-    mtr = mtralloc(*ld, *n);
+    mtr = mtrcalloc(*ld, *n);
 
     fscanf(mFile, "%" SCNu64, &i_);
     fscanf(mFile, "%" SCNu64, &j_);
@@ -35,10 +35,6 @@ double *readmtr(uint64_t *m, uint64_t *n, uint64_t *ld, FILE *mFile)
                     fscanf(mFile, "%" SCNu64, &j_);
                     fscanf(mFile, "%lf", &value);
                 }
-            }
-            else
-            {
-                M_(i,j) = 0;
             }
         }
     }
