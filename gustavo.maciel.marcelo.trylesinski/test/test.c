@@ -62,12 +62,12 @@ int main()
 /*FILE *aFile, *bFile;
 aFile = fopen("data/A", "w");
 bFile = fopen("data/B", "w");
-a = mtralloc(4, 3);
-b = mtralloc(3, 5);
-random_matrix(4, 3, a, 4);
-random_matrix(3, 5, b, 3);
-printmtr(4, 3, a, 3, aFile);
-printmtr(3, 5, b, 3, bFile);
+a = mtralloc(1000, 1000);
+b = mtralloc(1000, 1000);
+random_matrix(1000, 1000, a, 1000);
+random_matrix(1000, 1000, b, 1000);
+printmtr(1000, 1000, a, 1000, aFile);
+printmtr(1000, 1000, b, 1000, bFile);
 fclose(aFile);
 fclose(bFile);*/
 
@@ -106,7 +106,6 @@ fclose(bFile);*/
             mtrmul_opt(m, p, n, a, lda, b, ldb, c, ldc);
 
             dtime = dclock() - dtime;
-            printf("asuiehasuiheauisheuhasueiasuihe %le\n", dtime);
 
             if (rep == 0)
                 dtime_best = dtime;
@@ -116,7 +115,7 @@ fclose(bFile);*/
 
         diff = compare_matrices(m, n, c, ldc, cref, ldc);
 
-        printf("%d %le %le \n", k, gflops / dtime_best, diff);
+        printf("%d %le %le %le\n", k, gflops / dtime_best, diff, dtime_best);
         fflush(stdout);
 
         mtrfree(a);
