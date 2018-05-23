@@ -56,19 +56,10 @@ int main(int argc, char **argv)
     ldc = m;
     c = mtrcalloc(ldc, n);
 
-/*printf("\nMatriz A (%" PRIu64 " por %" PRIu64 "), lda = %" PRIu64 "\n", m, p, lda);
-printmtr(m, p, a, lda, stdout);
-printf("\nMatriz B (%" PRIu64 " por %" PRIu64 "), ldb = %" PRIu64 "\n", p, n, ldb);
-printmtr(p, n, b, ldb, stdout);*/
-
     if (impl == OPENMP_IMPL)
-        mtrmul_opt(m, p, n, a, lda, b, ldb, c, ldc);
+        mtrmul_opt_o(m, p, n, a, lda, b, ldb, c, ldc);
     else
-        mtrmul_opt(m, p, n, a, lda, b, ldb, c, ldc);
-
-/*printf("\nMatriz C (%" PRIu64 " por %" PRIu64 "), ldc = %" PRIu64 "\n", m, n, ldc);
-printmtr(m, n, c, ldc, stdout);
-printf("\n");*/
+        mtrmul_opt_o(m, p, n, a, lda, b, ldb, c, ldc);
 
     printmtr(m, n, c, ldc, cFile);
     fclose(cFile);

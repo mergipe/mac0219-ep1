@@ -103,7 +103,7 @@ fclose(bFile);*/
 
             dtime = dclock();
 
-            mtrmul_opt(m, p, n, a, lda, b, ldb, c, ldc);
+            mtrmul_opt_o(m, p, n, a, lda, b, ldb, c, ldc);
 
             dtime = dclock() - dtime;
 

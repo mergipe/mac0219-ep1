@@ -1,5 +1,5 @@
 CC     = gcc
-CFLAGS = -std=c99 -Wall -pedantic -O3 -flto
+CFLAGS = -std=c99 -Wall -pedantic -O3 -flto -fopenmp
 
 main: main.o mtrio.o mtrmul.o mtrmem.o
 	$(CC) $(CFLAGS) -o $@ $^
