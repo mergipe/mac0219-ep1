@@ -7,6 +7,25 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
+#define abs(x) (x < 0.0 ? -x : x)
+
+double compare_matrices(uint64_t m, uint64_t n, double *a, uint64_t lda,
+        double *b, uint64_t ldb)
+{
+    double max_diff = 0.0, diff;
+
+    for (uint64_t j = 0; j < n; j++)
+    {
+        for (uint64_t i = 0; i < m; i++)
+        {
+            diff = abs(A(i,j) - B(i,j));
+            max_diff = (diff > max_diff ? diff : max_diff);
+        }
+    }
+
+    return max_diff;
+}
+
 int main(int argc, char **argv)
 {
     char impl;
@@ -63,6 +82,23 @@ int main(int argc, char **argv)
 
     printmtr(m, n, c, ldc, cFile);
     fclose(cFile);
+
+double *c_;
+c_ = mtrcalloc(ldc,n);
+mtrmul_opt_o(m,p,n,a,lda,b,ldb,c,ldc);
+printf("%le\n", compare_matrices(m, n, c, ldc, c_, ldc));
+free(c_);
+
+/*cFile = fopen(argv[4], "r");
+if (cFile == NULL)
+{
+    fprintf(stderr, "Error opening file %s\n", argv[4]);
+    return EXIT_FAILURE;
+}
+double *c_ = readmtr(&m, &n, &ldc, cFile);
+printf("%le\n", compare_matrices(m, n, c, ldc, c_, ldc));
+fclose(cFile);
+mtrfree(c_);*/
 
     mtrfree(a);
     mtrfree(b);

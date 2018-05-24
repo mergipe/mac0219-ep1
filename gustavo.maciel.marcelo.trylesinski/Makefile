@@ -18,7 +18,7 @@ mtrmem.o: mtrmem.c mtrmem.h
 
 teste: test.o mtrio.o mtrmul.o mtrmem.o dclock.o
 	$(CC) $(CFLAGS) -o $@ $^
-	./teste >> test/output.m
+	./teste >> test/output_new.m
 
 dclock.o: test/dclock.c
 	$(CC) $(CFLAGS) -c $<

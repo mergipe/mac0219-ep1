@@ -4,8 +4,9 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define M_(i,j) mtr[j * (*ld) + i]
-#define M(i,j) mtr[j * ld + i]
+/* Macros para acessar uma posicao (i,j) das matrizes */
+#define M_(i,j) mtr[(j) * (*ld) + (i)]
+#define M(i,j)  mtr[(j) * ld + (i)]
 
 /* Devolve uma matriz double m por n, com leading dimension ld, lida de
  * mFile. */

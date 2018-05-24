@@ -3,14 +3,16 @@
 
 #include <stdint.h>
 
-#define M(i,j) mtr[j * ld + i]
+/* Macro para acessar uma posicao (i,j) da matriz mtr */
+#define M(i,j) mtr[(j) * ld + (i)]
 
 /* Aloca e devolve uma matriz double ld por od, nao inicializada, com leading
- * dimension ld. */
+ * dimension ld. A matriz é alocada como um vetor, tal que
+ * M(i,j) = mtr[j * ld + i]. */
 double *mtralloc(uint64_t ld, uint64_t od);
 
 /* Aloca e devolve uma matriz nula double ld por od, com leading dimension
- * ld. */
+ * ld. A matriz é alocada como um vetor, tal que M(i,j) = mtr[j * ld + i]. */
 double *mtrcalloc(uint64_t ld, uint64_t od);
 
 /* Limpa o espaco ocupado pela matriz double mtr. */
