@@ -3,6 +3,7 @@
 
 #include <omp.h>
 #include <stdint.h>
+#include <immintrin.h>
 
 /* Macros para acessar uma posicao (i,j) das matrizes. */
 #define  A(i,j)  a[(j) * lda  + (i)]
@@ -113,7 +114,7 @@ void mtrmul_opt_o(uint64_t m, uint64_t p, uint64_t n,
     for (m_ = m; m_ % 4 != 0; m_--); 
 
     /* Computa blocos 4x4 da matriz c, em paralelo */
-    #pragma omp parallel for
+//    #pragma omp parallel for
     for (uint64_t j = 0; j < n_; j += 4)
         for (uint64_t i = 0; i < m_; i += 4)
             dotprod_4x4(&A_(i,0), lda_, &B(0,j), ldb, &C(i,j), ldc, p);
