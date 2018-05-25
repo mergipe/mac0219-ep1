@@ -5,6 +5,10 @@
 #include <stdint.h>
 #include <stdio.h>
 
+/* Macros para acessar uma posicao (i,j) das matrizes */
+#define  M(i,j) mtr[(j) *   ld  + (i)]
+#define M_(i,j) mtr[(j) * (*ld) + (i)]
+
 double *readmtr(uint64_t *m, uint64_t *n, uint64_t *ld, FILE *mFile)
 {
     uint64_t i_, j_;
@@ -14,7 +18,6 @@ double *readmtr(uint64_t *m, uint64_t *n, uint64_t *ld, FILE *mFile)
     fscanf(mFile, "%" SCNu64, n);
 
     *ld = *m;
-
     mtr = mtrcalloc(*ld, *n);
 
     fscanf(mFile, "%" SCNu64, &i_);

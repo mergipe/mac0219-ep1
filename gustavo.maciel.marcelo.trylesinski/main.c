@@ -2,68 +2,101 @@
 #include "mtrmem.h"
 #include "mtrmul.h"
 
+#include <argp.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <inttypes.h>
 
-#define abs(x) (x < 0.0 ? -x : x)
+static char doc[] =
+    "This program computes the matrix multiplication C = A * B.\v"
+    "You have to choose one of the OPTIONS.";
 
-double compare_matrices(uint64_t m, uint64_t n, double *a, uint64_t lda,
-        double *b, uint64_t ldb)
+static char args_doc[] = "FILE_A FILE_B FILE_C";
+
+static struct argp_option options[] = 
 {
-    double max_diff = 0.0, diff;
+    {0,        0,  0, 0,                            "OPTIONS:"},
+    {0,       'o', 0, 0,                            "Run the OpenMP implementation"},
+    {0,       'p', 0, 0,                            "Run the pthread implementation"},
+    {0,        0,  0, 0,                            "ARGS:"},
+    {"FILE_A", 0,  0, OPTION_DOC | OPTION_NO_USAGE, "Path to matrix A file"},
+    {"FILE_B", 0,  0, OPTION_DOC | OPTION_NO_USAGE, "Path to matrix B file"},
+    {"FILE_C", 0,  0, OPTION_DOC | OPTION_NO_USAGE, "Path to matrix C file"},
+    {0}
+};
 
-    for (uint64_t j = 0; j < n; j++)
+struct arguments
+{
+    char *args[3];
+    int openmp, pthread;
+};
+
+static error_t parse_opt(int key, char *arg, struct argp_state *state)
+{
+    struct arguments *arguments = state->input;
+
+    switch(key)
     {
-        for (uint64_t i = 0; i < m; i++)
-        {
-            diff = abs(A(i,j) - B(i,j));
-            max_diff = (diff > max_diff ? diff : max_diff);
-        }
+        case 'o':
+            arguments->openmp = 1;
+            break;
+        case 'p':
+            arguments->pthread = 1;
+            break;
+
+        case ARGP_KEY_ARG:
+            if (state->arg_num >= 3)
+                argp_state_help(state, stderr, ARGP_HELP_STD_HELP);
+            arguments->args[state->arg_num] = arg;
+            break;
+
+        case ARGP_KEY_END:
+            if (state->arg_num < 3)
+                argp_state_help(state, stderr, ARGP_HELP_STD_HELP);
+            break;
+
+        default:
+            return ARGP_ERR_UNKNOWN;
     }
 
-    return max_diff;
+    if (arguments->openmp == arguments->pthread)
+        argp_state_help(state, stderr, ARGP_HELP_STD_HELP);
+
+    return 0;
 }
+
+static struct argp argp = { options, parse_opt, args_doc, doc };
 
 int main(int argc, char **argv)
 {
-    char impl;
     double *a, *b, *c;
     uint64_t m, p, n, lda, ldb, ldc;
     FILE *aFile, *bFile, *cFile;
+    struct arguments arguments;
 
-    if (argc != 5 || (argv[1][0] != OPENMP_IMPL && argv[1][0] != PTHREAD_IMPL))
-    {
-        fprintf(stderr,
-                "Usage: %s <implementation> <file_a> <file_b> <file_c>\n"
-                "  where <implementation> is\n"
-                "     p   for an implementation using pthreads\n"
-                "     o   for an implementation using OpenMP\n",
-                argv[0]);
-        return EXIT_FAILURE;
-    }
+    arguments.openmp = 0;
+    arguments.pthread = 0;
 
-    impl = argv[1][0];
+    argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
-    aFile = fopen(argv[2], "r");
+    aFile = fopen(arguments.args[0], "r");
     if (aFile == NULL)
     {
-        fprintf(stderr, "Error opening file %s\n", argv[2]);
+        perror(arguments.args[0]);
         return EXIT_FAILURE;
     }
 
-    bFile = fopen(argv[3], "r");
+    bFile = fopen(arguments.args[1], "r");
     if (bFile == NULL)
     {
-        fprintf(stderr, "Error opening file %s\n", argv[3]);
+        perror(arguments.args[1]);
         return EXIT_FAILURE;
     }
 
-    cFile = fopen(argv[4], "w");
+    cFile = fopen(arguments.args[2], "w");
     if (cFile == NULL)
     {
-        fprintf(stderr, "Error opening file %s\n", argv[4]);
+        perror(arguments.args[2]);
         return EXIT_FAILURE;
     }
 
@@ -75,30 +108,13 @@ int main(int argc, char **argv)
     ldc = m;
     c = mtrcalloc(ldc, n);
 
-    if (impl == OPENMP_IMPL)
+    if (arguments.openmp)
         mtrmul_opt_o(m, p, n, a, lda, b, ldb, c, ldc);
     else
-        mtrmul_opt_o(m, p, n, a, lda, b, ldb, c, ldc);
+        mtrmul_opt_p(m, p, n, a, lda, b, ldb, c, ldc);
 
     printmtr(m, n, c, ldc, cFile);
     fclose(cFile);
-
-double *c_;
-c_ = mtrcalloc(ldc,n);
-mtrmul_opt_o(m,p,n,a,lda,b,ldb,c,ldc);
-printf("%le\n", compare_matrices(m, n, c, ldc, c_, ldc));
-free(c_);
-
-/*cFile = fopen(argv[4], "r");
-if (cFile == NULL)
-{
-    fprintf(stderr, "Error opening file %s\n", argv[4]);
-    return EXIT_FAILURE;
-}
-double *c_ = readmtr(&m, &n, &ldc, cFile);
-printf("%le\n", compare_matrices(m, n, c, ldc, c_, ldc));
-fclose(cFile);
-mtrfree(c_);*/
 
     mtrfree(a);
     mtrfree(b);

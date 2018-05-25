@@ -2,14 +2,14 @@
 % per clock cycle
 %
 
-nflops_per_cycle = 4;
+nflops_per_cycle = 16;
 
 %
 % Indicate the number of processors being used (in case you are using a
 % multicore or SMP)
 %
 
-nprocessors = 6;
+nprocessors = 4;
 
 %
 % Indicate the clock speed of the processor.  On a Linux machine this info
@@ -19,4 +19,4 @@ nprocessors = 6;
 % the peak clock rate...
 %
 
-GHz_of_processor = 2.8;
+GHz_of_processor = 3.3;

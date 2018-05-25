@@ -1,12 +1,23 @@
 #include "mtrmul.h"
 #include "mtrmem.h"
 
-#include <stdint.h>
 #include <omp.h>
+#include <stdint.h>
+
+/* Macros para acessar uma posicao (i,j) das matrizes. */
+#define  A(i,j)  a[(j) * lda  + (i)]
+#define  B(i,j)  b[(j) * ldb  + (i)]
+#define  C(i,j)  c[(j) * ldc  + (i)]
+#define A_(i,j) a_[(i) * lda_ + (j)]
+
+/* Macros para acessar uma posicao i dos vetores (somente para deixar a notacao
+ * padronizada). */
+#define a(k) a[k]
+#define b(k) b[k]
 
 /* Computa o produto interno c = a * b + c entre os vetores a e b de tamanho
- * p. lda é o incremento usado para percorrer os valores de a. */
-static void dotprod(double *a, uint64_t lda, double *b, double *c, uint64_t p)
+ * p. O parametro lda é o incremento usado para percorrer os valores de a. */
+static void dotprod(double *a, double *b, double *c, uint64_t p)
 {
     for (uint64_t k = 0; k < p; k++)
         *c += a(k) * b(k);
@@ -14,7 +25,7 @@ static void dotprod(double *a, uint64_t lda, double *b, double *c, uint64_t p)
 
 /* Computa 4x4 produtos internos C(i,j) = A(i,k) * B(k,j) + C(i,j), com
  * 0 <= i,j <= 3 e 0 <= k <= p. */
-static void dotprod_4x4(double *a_, uint64_t lda, double *b, uint64_t ldb,
+static void dotprod_4x4(double *a_, uint64_t lda_, double *b, uint64_t ldb,
                         double *c, uint64_t ldc, uint64_t p)
 {
     /* Um registrador para cada posicao de c a ser computada e um registrador
@@ -85,11 +96,12 @@ void mtrmul_opt_o(uint64_t m, uint64_t p, uint64_t n,
                   double *b, uint64_t ldb,
                   double *c, uint64_t ldc)
 {
-    uint64_t m_, n_;
+    uint64_t m_, n_, lda_;
     double *a_;
 
     /* A matriz a_ é alocada em row major para melhorar o acesso ao cache */
-    a_ = mtralloc(lda, p);
+    lda_ = ldb;
+    a_ = mtralloc(m, lda_);
 
     for (uint64_t i = 0; i < m; i++)
         for (uint64_t j = 0; j < p; j++)
@@ -100,20 +112,21 @@ void mtrmul_opt_o(uint64_t m, uint64_t p, uint64_t n,
     for (n_ = n; n_ % 4 != 0; n_--);
     for (m_ = m; m_ % 4 != 0; m_--); 
 
-    /* Computa blocos 4x4 da matriz c */
+    /* Computa blocos 4x4 da matriz c, em paralelo */
+    #pragma omp parallel for
     for (uint64_t j = 0; j < n_; j += 4)
         for (uint64_t i = 0; i < m_; i += 4)
-            dotprod_4x4(&A_(i,0), lda, &B(0,j), ldb, &C(i,j), ldc, p);
+            dotprod_4x4(&A_(i,0), lda_, &B(0,j), ldb, &C(i,j), ldc, p);
 
     /* Computa as colunas restantes */
     for (uint64_t j = n_; j < n; j++)
         for (uint64_t i = 0; i < m; i++)
-            dotprod(&A_(i,0), lda, &B(0,j), &C(i,j), p);
+            dotprod(&A_(i,0), &B(0,j), &C(i,j), p);
 
     /* Computa as linhas restantes */
     for (uint64_t i = m_; i < m; i++)
         for (uint64_t j = 0; j < n_; j++)
-            dotprod(&A_(i,0), lda, &B(0,j), &C(i,j), p);
+            dotprod(&A_(i,0), &B(0,j), &C(i,j), p);
 
     mtrfree(a_);
 }
@@ -123,10 +136,11 @@ void mtrmul_opt_p(uint64_t m, uint64_t p, uint64_t n,
                   double *b, uint64_t ldb,
                   double *c, uint64_t ldc)
 {
-    uint64_t m_, n_;
+    uint64_t m_, n_, lda_;
     double *a_;
 
-    a_ = mtralloc(lda, p);
+    lda_ = ldb;
+    a_ = mtralloc(m, lda_);
 
     for (uint64_t i = 0; i < m; i++)
         for (uint64_t j = 0; j < p; j++)
@@ -137,15 +151,15 @@ void mtrmul_opt_p(uint64_t m, uint64_t p, uint64_t n,
 
     for (uint64_t j = 0; j < n_; j += 4)
         for (uint64_t i = 0; i < m_; i += 4)
-            dotprod_4x4(&A_(i,0), lda, &B(0,j), ldb, &C(i,j), ldc, p);
+            dotprod_4x4(&A_(i,0), lda_, &B(0,j), ldb, &C(i,j), ldc, p);
 
     for (uint64_t j = n_; j < n; j++)
         for (uint64_t i = 0; i < m; i++)
-            dotprod(&A_(i,0), lda, &B(0,j), &C(i,j), p);
+            dotprod(&A_(i,0), &B(0,j), &C(i,j), p);
 
     for (uint64_t i = m_; i < m; i++)
         for (uint64_t j = 0; j < n_; j++)
-            dotprod(&A_(i,0), lda, &B(0,j), &C(i,j), p);
+            dotprod(&A_(i,0), &B(0,j), &C(i,j), p);
 
     mtrfree(a_);
 }

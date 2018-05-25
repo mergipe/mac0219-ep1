@@ -5,17 +5,16 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <inttypes.h>
 
-#define PFIRST 50
+#define PFIRST 40
 #define PLAST  1000
-#define PINC   50
+#define PINC   40
 
 #define NREPEATS 3
 
-#define A(i,j) a[j * lda + i]
-#define B(i,j) b[j * ldb + i]
-#define abs(x) (x < 0.0 ? -x : x)
+/* Macros para acessar uma posicao (i,j) das matrizes */
+#define A(i,j) a[(j) * lda + (i)]
+#define B(i,j) b[(j) * ldb + (i)]
 
 double dclock();
 
@@ -75,7 +74,9 @@ fclose(bFile);*/
 
     for (int k = PFIRST; k <= PLAST; k += PINC)
     {
-        m = p = n = k;
+        m = k;
+        n = k;
+        p = k;
 
         lda = m;
         ldb = p;

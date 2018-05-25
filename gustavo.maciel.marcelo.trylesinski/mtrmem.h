@@ -3,9 +3,6 @@
 
 #include <stdint.h>
 
-/* Macro para acessar uma posicao (i,j) da matriz mtr */
-#define M(i,j) mtr[(j) * ld + (i)]
-
 /* Aloca e devolve uma matriz double ld por od, nao inicializada, com leading
  * dimension ld. A matriz é alocada como um vetor, tal que
  * M(i,j) = mtr[j * ld + i]. */
