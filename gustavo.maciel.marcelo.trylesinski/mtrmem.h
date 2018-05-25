@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define ALIGN_SIZE 32
+
 /* Aloca e devolve uma matriz double ld por od, nao inicializada, com leading
  * dimension ld. A matriz é alocada como um vetor, tal que
  * M(i,j) = mtr[j * ld + i]. */
