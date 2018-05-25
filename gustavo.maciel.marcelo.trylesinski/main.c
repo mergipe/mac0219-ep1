@@ -9,7 +9,7 @@
 
 static char doc[] =
     "This program computes the matrix multiplication C = A * B.\v"
-    "You have to choose one of the OPTIONS.";
+    "You have to choose exactly one of the OPTIONS.";
 
 static char args_doc[] = "FILE_A FILE_B FILE_C";
 
