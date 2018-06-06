@@ -8,4 +8,62 @@
 ** EP1
 */
 
+A solução foi baseada nas páginas da wiki How To Optimize Gemm, disponível no
+GitHub através do seguinte link:
 
+https://github.com/flame/how-to-optimize-gemm/wiki
+
+As matrizes são armazenadas na memória em vetores unidimensionais alinhados em
+32 bytes (isso é necessário para a utilização de algumas funções do AVX),
+utilizando a função _mm_malloc de xmmintrin.h. As matrizes A, B e C são
+armazenadas em column-major order. Para otimizar o uso do cache na
+multiplicação de A e B, a matriz A é posteriormente realocada em row-major
+order.
+
+            -------------------------------------------------------------------------------
+    A(mxp): | A(0,0) | ... | A(0,p) | A(1,0) | ... | A(1,p) | ... | A(m,0) | ... | A(m,p) |
+            -------------------------------------------------------------------------------
+            -------------------------------------------------------------------------------
+    B(pxn): | B(0,0) | ... | B(p,0) | B(0,1) | ... | B(p,1) | ... | B(0,n) | ... | B(p,n) |
+            -------------------------------------------------------------------------------
+            -------------------------------------------------------------------------------
+    C(mxn): | C(0,0) | ... | C(m,0) | C(0,1) | ... | C(m,1) | ... | C(0,n) | ... | C(m,n) |
+            -------------------------------------------------------------------------------
+
+Para acessar as posições A(i,j), B(i,j) e C(i,j) das matrizes, foram criados
+macros, deixando o código mais limpo:
+
+    #define A_(i,j) a_[(i) * lda_ + (j)]
+    #define  B(i,j)  b[(j) * ldb  + (i)]
+    #define  C(i,j)  c[(j) * ldc  + (i)]
+
+lda, ldb e ldc, são as 'leading dimensions' de A, B, e C, respectivamente. A
+'leading dimension' é o 'salto' na memória entre uma linha e outra da matriz,
+no caso da matriz ser armazenada em row-major order. Aqui usamos lda_ = ldb,
+ldb = p e ldc = m.
+
+A primeira grande otimização foi calcular um bloco 4x4 da matriz C em uma única
+iteração, reduzindo operações de soma e verificação de contadores. Mas para
+isso funcionar para matrizes com dimensões não divisíveis por 4, esse método
+foi usado no cálculo da submatriz maximal de C em que ambas dimensões são
+divisíveis por 4. Assim, o resto da matriz C foi calculada do jeito simples.
+
+A segunda grande otimização foi utilizar registradores vetoriais e instruções
+AVX (immintrin.h) para fazer os cálculos. Foi criado um registrador para cada
+coluna do bloco 4x4 da matriz C (4 registradores), um para as 4 linhas
+utilizadas de A, e um para cada coluna utilizada de B (4 registradores). Foram
+usados registradores do tipo __m256d, que armazenam 4 doubles.
+As funções utilizadas para as adições e multiplicações de linhas e colunas
+foram _mm256_add_pd e _mm256_mul_pd. As funções _mm256_set1_pd, _mm256_load_pd
+e _mm256_store_pd foram utilizadas para fazer acessos à memória e inicializar
+os registradores.
+
+A terceira grande otimização foi criar uma matriz A_ igual a A, porém
+armazenada em row-major order, para otimizar o uso do cache.
+
+Por fim, o código foi paralelizado, com uma versão utilizando OpenMP e a outra
+utilizando pthreads.
+A versão utilizando OpenMP usa somente
+    #pragma omp parallel for
+antes do loop principal da multiplicação.
+A versão utilizando pthreads utiliza uma thread para cada
