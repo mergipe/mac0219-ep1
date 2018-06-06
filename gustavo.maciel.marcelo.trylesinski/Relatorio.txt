@@ -68,6 +68,8 @@ armazenada em row-major order, para otimizar o uso do cache.
 Por fim, o código foi paralelizado, com uma versão utilizando OpenMP e a outra
 utilizando pthreads.
 A versão utilizando OpenMP usa somente
+
     #pragma omp parallel for
+
 antes do loop principal da multiplicação.
 A versão utilizando pthreads 
