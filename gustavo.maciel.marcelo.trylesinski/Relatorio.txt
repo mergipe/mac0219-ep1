@@ -13,6 +13,10 @@ GitHub através do seguinte link:
 
 https://github.com/flame/how-to-optimize-gemm/wiki
 
+As otimizações são baseadas no algoritmo 'naive' de multiplicação de matrizes.
+Acredito que essa escolha foi feita pela maior facilidade de otimizar esse
+algoritmo, apesar de ser assintoticamente pior.
+
 As matrizes são armazenadas na memória em vetores unidimensionais alinhados em
 32 bytes (isso é necessário para a utilização de algumas funções do AVX),
 utilizando a função _mm_malloc de xmmintrin.h. As matrizes A, B e C são
@@ -66,4 +70,4 @@ utilizando pthreads.
 A versão utilizando OpenMP usa somente
     #pragma omp parallel for
 antes do loop principal da multiplicação.
-A versão utilizando pthreads utiliza uma thread para cada
+A versão utilizando pthreads 
